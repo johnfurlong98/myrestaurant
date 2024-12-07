@@ -1,0 +1,20 @@
+<!-- menu_list.html -->
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h2>Our Menu</h2>
+  <ul>
+    {% for item in items %}
+      <li>
+        <a href="{% url 'menu_detail' item.pk %}">{{ item.name }}</a> - ${{ item.price }}
+        <p>{{ item.description }}</p>
+        {% if item.image %}
+          <img src="{{ item.image.url }}" alt="{{ item.name }}" style="max-width: 200px;">
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No menu items available at the moment.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

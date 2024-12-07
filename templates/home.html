@@ -1,0 +1,10 @@
+<!-- templates/home.html -->
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Welcome to the Online Restaurant Booking System</h1>
+  <p>Reserve your table and explore our delicious menu!</p>
+  <a href="{% url 'book_table' %}">Book a Table</a>
+  <a href="{% url 'menu_list' %}">View Menu</a>
+{% endblock %}
