@@ -26,13 +26,14 @@ SECRET_KEY = 'django-insecure-@@vn39x79qm)rs0nvgi7w2ujcnjv4agm_vd!b$+s6pjq#ev)3f
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '8000-johnfurlong-myrestauran-8ibded352jb.ws-eu117.gitpod.io',
-    'localhost',
     '127.0.0.1',
+    'localhost',
+    '8000-johnfurlong-myrestauran-rj3jknl0z6g.ws-eu117.gitpod.io',  # Add your Gitpod URL
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    'https://8000-johnfurlong-myrestauran-8ibded352jb.ws-eu117.gitpod.io',
+    'https://8000-johnfurlong-myrestauran-rj3jknl0z6g.ws-eu117.gitpod.io',
 ]
 
 # Application definition
