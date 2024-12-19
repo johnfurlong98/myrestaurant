@@ -6,6 +6,20 @@
 <div class="container mt-5">
     <h2 class="mb-4">My Bookings</h2>
 
+    <!-- Sorting Options -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <form method="get" class="form-inline">
+                <label class="mr-2" for="sort">Sort by:</label>
+                <select name="sort" id="sort" class="form-control mr-2" onchange="this.form.submit()">
+                    <option value="date_desc" {% if sort == "date_desc" %}selected{% endif %}>Date Descending</option>
+                    <option value="date_asc" {% if sort == "date_asc" %}selected{% endif %}>Date Ascending</option>
+                    <option value="status" {% if sort == "status" %}selected{% endif %}>Status</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
     {% if bookings %}
         <div class="table-responsive">
             <table class="table table-striped table-hover">
@@ -42,12 +56,35 @@
                             </td>
                             <td>{{ booking.special_requests|default:"N/A" }}</td>
                             <td>
-                                {% if booking.status != 'CANCELLED' and booking.booking_date > today %}
+                                {% if booking.status != 'CANCELLED' and booking.booking_date >= today %}
                                     <a href="{% url 'booking_update' booking.id %}" class="btn btn-sm btn-primary">Edit</a>
-                                    <form action="{% url 'booking_cancel' booking.id %}" method="post" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#cancelModal{{ booking.id }}">
+                                        Cancel
+                                    </button>
+
+                                    <!-- Cancel Booking Modal -->
+                                    <div class="modal fade" id="cancelModal{{ booking.id }}" tabindex="-1" aria-labelledby="cancelModalLabel{{ booking.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="cancelModalLabel{{ booking.id }}">Cancel Booking #{{ booking.id }}</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to cancel this booking?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <form action="{% url 'booking_cancel' booking.id %}" method="post" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 {% else %}
                                     <span class="text-muted">No actions available</span>
                                 {% endif %}
@@ -57,6 +94,51 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if bookings.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ bookings.previous_page_number }}&sort={{ sort }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in bookings.paginator.page_range %}
+                    {% if bookings.number == num %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num > bookings.number|add:'-3' and num < bookings.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}&sort={{ sort }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ bookings.next_page_number }}&sort={{ sort }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     {% else %}
         <div class="alert alert-info" role="alert">
             You have no bookings at the moment. <a href="{% url 'booking_create' %}" class="alert-link">Book a table now!</a>
